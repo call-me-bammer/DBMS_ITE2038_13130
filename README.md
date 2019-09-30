@@ -1,69 +1,35 @@
 # **DBMS_ITE2038_13130**
 
-* ## Page Header
->  Number of records
->  Free space
->  (maybe) a next/last pointer
->  Bitmaps, Slot Table ... and so on.
+>### **1. Possible call path of the insert/delete operation**
+* ## ***Insertion***
+\
+In main
 
-record length can be Fixed or Variable.
-How can we find records?
-> by record id! == ( PageId, Location in Page )
-How do we add and delete records...?
+    case 'i':
+        scanf("%d", &input);
+        root = insert(root, input, input);
+        print_tree(root);
+        break;
 
-* ### page layouts,
-depends on
-- Record length (fixed or variable)
-- page packing method (packed or unpacked)
+In bpt.c ( line 456 ~ 848 )
 
-<bpt.h>
-
-### add key?
-typedef struct record {
-    int value;
-} record;
-
-typedef struct node {
-    void ** pointers;
-    int * keys;
-    struct node * parent;
-    bool is_leaf;
-    int num_keys;
-    struct node * next; // Used for queue.
-} node;
-
-(In main,)
-declare, 
-
-<pre><code>
-char * input_file;
-FILE* fp;
-node * root = NULL;
-
-input input;
-char instruction;
-</code></pre>
+    (master insertion func.) line 803 ~ 848
 
 
+1. 먼저 main에서, root에 key-value에 해당하는 input을 parameter로
+master insertion function에 전달한다.
 
-[root = insert(root, input, input);]        
-### in main,
-        case 'i':
-            scanf("%d", &input);
-            root = insert(root, input, input);
-            print_tree(root);
-            break;
-### in bpt.c, line 456 ~ 848
-
-### (master func.) in bpt.c, line 803 ~ 848
-
-
-* 현재 구현은 복사를 무시함...
-root에 key, value에 해당하는 int type의 input를 parameter로
-master insertion function에 전달한다. 먼저 트리에 동일한 key
-값이 있는지 find() 함수를 호출하여 확인한다. 동일한 key가
-존재하면 insert 내에서 root를 그대로 반환하여 중단하고, find가
-NULL값을 반환할 경우 insert를 계속 진행한다.
+    
+    >node * insert( node * root, int key, int value );
+    
+    \
+    먼저 트리에 동일한 key가 있는지
+    
+    >record * find( node * root, int key, bool verbose )
+    
+    를 호출하여 확인한다. 동일한 key가
+    존재하면 main으로 root를 그대로 반환하여 insertion을 중단한다. find가
+N   ULL값을 반환할 경우 insert를 계속 진행한다.
 
 make_record() 함수를 호출하여 새 record를 동적할당된 value값
 을 갖는 pointer라는 이름의 record를 생성한다.
@@ -100,7 +66,7 @@ key와 keys 배열값과 비교하여 insertion point를 찾은 후, 위치에 �
 네번째 경우, leaf에 이미 order - 1 개수 만큼의 key가 존재하여 split한 
 이후에 leaf에 insert를 수행해야한다. 
 
-
+* ## ***Deletion***
 
 [root = delete(root, input);]
 ### in main,
@@ -127,16 +93,17 @@ main으로 변경된 root를 리턴한다.
 ... delete_entry는 root, key_leaf (함수 내에서 n으로 정의한다.), key, key_record (함수 내에서 pointer로 정의한다.) 를 parameter로 받는다.
 (그 외 선언 무시하고...)
 
-
+```
 > i 10
 5 |
 3 | 7 9 |
 1 2 | 3 4 | 5 6 | 7 8 | 9 10 |
+
 > d 6
 5 |
 3 | 9 |
 1 2 | 3 4 | 5 7 8 | 9 10 |
-
+```
 
 remove_entry_from_node 함수 호출 ㄱㄱ,
 ... 예를 들어, delete 6을 해보겠음. 먼저 key_leaf 노드에서 delete할 key에
@@ -188,6 +155,7 @@ NULL로 할당한다.
          delete가 완료 되었으므로, key_record를 free하고 root를 메인으로 리턴한다.
 
 
+> **2. Detail flow of the structure modification (split, merge)**
 
 
 ## **insertion after split**
@@ -213,6 +181,57 @@ node * delete(node * root, int key);
 \
 \
 a-ha.
+
+> **3. (Naïve) designs or required changes for building on-disk b+ tree**
+
+
+* 현재 구현은 복사를 무시함...
+
+
+
+* ## Page Header
+>  Number of records
+>  Free space
+>  (maybe) a next/last pointer
+>  Bitmaps, Slot Table ... and so on.
+
+record length can be Fixed or Variable.
+How can we find records?
+> by record id! == ( PageId, Location in Page )
+How do we add and delete records...?
+
+* ### page layouts,
+depends on
+- Record length (fixed or variable)
+- page packing method (packed or unpacked)
+
+<bpt.h>
+
+### add key?
+typedef struct record {
+    int value;
+} record;
+
+typedef struct node {
+    void ** pointers;
+    int * keys;
+    struct node * parent;
+    bool is_leaf;
+    int num_keys;
+    struct node * next; // Used for queue.
+} node;
+
+(In main,)
+declare, 
+
+<pre><code>
+char * input_file;
+FILE* fp;
+node * root = NULL;
+
+input input;
+char instruction;
+</code></pre>
 
 
 ---
