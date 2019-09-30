@@ -925,10 +925,9 @@ node * adjust_root(node * root) {
      * so nothing to be done.
      */
 
-    if (root->num_keys > 0) {
-        printf("adjust-case1::nonempty root\n");
+    if (root->num_keys > 0)
         return root;
-    }
+
     /* Case: empty root. 
      */
 
@@ -1164,10 +1163,8 @@ node * delete_entry( node * root, node * n, int key, void * pointer ) {
      * (The simple case.)
      */
 
-    if (n->num_keys >= min_keys) {
-        printf("Proper min_keys condition!\n");
+    if (n->num_keys >= min_keys)
         return root;
-    }
 
     /* Case:  node falls below minimum.
      * Either coalescence or redistribution
