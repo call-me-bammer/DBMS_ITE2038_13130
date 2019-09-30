@@ -925,9 +925,10 @@ node * adjust_root(node * root) {
      * so nothing to be done.
      */
 
-    if (root->num_keys > 0)
+    if (root->num_keys > 0) {
+        printf("adjust-case1::nonempty root\n");
         return root;
-
+    }
     /* Case: empty root. 
      */
 
@@ -936,6 +937,7 @@ node * adjust_root(node * root) {
     // as the new root.
 
     if (!root->is_leaf) {
+        printf("adjust-case2-1::empty root but has child\n");
         new_root = root->pointers[0];
         new_root->parent = NULL;
     }
@@ -943,8 +945,10 @@ node * adjust_root(node * root) {
     // If it is a leaf (has no children),
     // then the whole tree is empty.
 
-    else
+    else {
+        printf("adjust-case2-2::empty tree\n");
         new_root = NULL;
+    }
 
     free(root->keys);
     free(root->pointers);
@@ -1056,7 +1060,7 @@ node * redistribute_nodes(node * root, node * n, node * neighbor, int neighbor_i
     int i;
     node * tmp;
 
-    /* Case: n has a neighbor to the left. 
+    /* Case: n has a neighbor to the left.
      * Pull the neighbor's last key-pointer pair over
      * from the neighbor's right end to n's left end.
      */
@@ -1160,8 +1164,10 @@ node * delete_entry( node * root, node * n, int key, void * pointer ) {
      * (The simple case.)
      */
 
-    if (n->num_keys >= min_keys)
+    if (n->num_keys >= min_keys) {
+        printf("Proper min_keys condition!\n");
         return root;
+    }
 
     /* Case:  node falls below minimum.
      * Either coalescence or redistribution
