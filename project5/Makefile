@@ -6,15 +6,10 @@ SRCDIR=src/
 INC=include/
 LIBS=lib/
 
-# SRCS:=$(wildcard src/*.c)
-# OBJS:=$(SRCS:.c=.o)
-
-# main source file
 TARGET_SRC:=$(SRCDIR)main.c
 TARGET_OBJ:=$(SRCDIR)main.o
 
-# Include more files if you write another source file.
-SRCS_FOR_LIB:=$(SRCDIR)bpt.c
+SRCS_FOR_LIB:=$(SRCDIR)utils.c $(SRCDIR)bpt.c $(SRCDIR)file_manager.c $(SRCDIR)buffer_manager.c
 OBJS_FOR_LIB:=$(SRCS_FOR_LIB:.c=.o)
 
 CFLAGS+= -g -fPIC -I $(INC)
@@ -24,7 +19,10 @@ TARGET=main
 all: $(TARGET)
 
 $(TARGET): $(TARGET_OBJ)
-	$(CC) $(CFLAGS) -o $(OBJS_FOR_LIB) -c $(SRCS_FOR_LIB)
+	$(CC) $(CFLAGS) -o $(SRCDIR)utils.o -c $(SRCDIR)utils.c
+	$(CC) $(CFLAGS) -o $(SRCDIR)bpt.o -c $(SRCDIR)bpt.c
+	$(CC) $(CFLAGS) -o $(SRCDIR)file_manager.o -c $(SRCDIR)file_manager.c
+	$(CC) $(CFLAGS) -o $(SRCDIR)buffer_manager.o -c $(SRCDIR)buffer_manager.c
 	make static_library
 	$(CC) $(CFLAGS) -o $@ $^ -L $(LIBS) -lbpt
 
